@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>360 Viewer with Fixed Marker Positions</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum/build/pannellum.css" />
+    <script src="https://cdn.jsdelivr.net/npm/pannellum/build/pannellum.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            height: 100vh;
+        }
+
+        #map-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: #f0f0f0;
+            overflow: hidden;
+        }
+
+        #map-image {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .marker {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: red;
+            border-radius: 50%;
+            cursor: pointer;
+            transform: translate(-50%, -50%);
+        }
+
+        .marker-label {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 3px 8px;
+            font-size: 12px;
+            border-radius: 5px;
+            transform: translate(-50%, -150%);
+            white-space: nowrap;
+        }
+
+        #viewer-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            z-index: 10;
+        }
+
+        #viewer {
+            width: 100%;
+            height: 100%;
+        }
+
+        #close-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            background: white;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            z-index: 11;
+        }
+
+        #close-button:hover {
+            background: red;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Bản đồ toàn màn hình -->
+    <div id="map-container">
+        <img id="map-image" src="images/mapLGN.jpg" alt="Map" />
+    </div>
+
+    <!-- Viewer ảnh 360 -->
+    <div id="viewer-container">
+        <button id="close-button">Close</button>
+        <div id="viewer"></div>
+    </div>
+
+    <script>
+        // Dữ liệu về vị trí và ảnh 360 với tọa độ tương đối
+        const locations = [
+            { name: "ZoneB 1", image: "images/ZoneB1.jpg", x: 0.41, y: 0.61 },
+            { name: "ZoneB 2", image: "images/ZoneB2.jpg", x: 0.42, y: 0.53 },
+            { name: "ZoneB 3", image: "images/ZoneB3.jpg", x: 0.463, y: 0.675 },
+            { name: "ZoneB 4", image: "images/ZoneB4.jpg", x: 0.38, y: 0.68 },
+            { name: "ZoneA 1", image: "images/ZoneA1_Birdview.jpg", x: 0.60, y: 0.36 },
+            { name: "ZoneA 2", image: "images/ZoneA2.jpg", x: 0.56, y: 0.25 },
+            { name: "ZoneA 3", image: "images/ZoneA3.jpg", x: 0.51, y: 0.35 },
+            { name: "ZoneA 4", image: "images/ZoneA4.jpg", x: 0.6, y: 0.18 },
+            { name: "ZoneC 1", image: "images/ZoneC_A1.jpg", x: 0.49, y: 0.78 },
+            { name: "ZoneC 2", image: "images/ZoneC2_Birdview.jpg", x: 0.42, y: 0.80 },
+            { name: "ZoneC 3", image: "images/ZoneC3_Eyeview.jpg", x: 0.39, y: 0.75 },
+            { name: "ZoneC 4", image: "images/ZoneC4_Eyeview.jpg", x: 0.3, y: 0.75 },
+            
+        ];
+
+        const mapContainer = document.getElementById('map-container');
+        const mapImage = document.getElementById('map-image');
+        const viewerContainer = document.getElementById('viewer-container');
+        const closeButton = document.getElementById('close-button');
+        let viewer; // Viewer ảnh 360
+
+        // Hàm hiển thị ảnh 360
+        function loadImage(imagePath) {
+            if (viewer) {
+                viewer.destroy();
+            }
+            viewerContainer.style.display = 'block';
+            viewer = pannellum.viewer('viewer', {
+                type: 'equirectangular',
+                panorama: imagePath,
+                autoLoad: true,
+                showControls: true,
+ hfov: 120, // Góc nhìn ngang ban đầu
+        minHfov: 100, // Giới hạn thu nhỏ
+        maxHfov: 120 // Giới hạn phóng to
+            });
+        }
+
+        // Hàm tạo marker
+        function createMarker(location) {
+            const marker = document.createElement('div');
+            marker.className = 'marker';
+            marker.title = location.name;
+
+            const label = document.createElement('div');
+            label.className = 'marker-label';
+            label.innerText = location.name;
+
+            marker.addEventListener('click', () => {
+                loadImage(location.image);
+            });
+
+            mapContainer.appendChild(marker);
+            mapContainer.appendChild(label);
+
+            // Định vị marker và label dựa trên kích thước thực tế của hình ảnh
+            function positionMarker() {
+                const rect = mapImage.getBoundingClientRect();
+                const xPos = rect.left + location.x * rect.width;
+                const yPos = rect.top + location.y * rect.height;
+
+                marker.style.left = `${xPos}px`;
+                marker.style.top = `${yPos}px`;
+                label.style.left = `${xPos}px`;
+                label.style.top = `${yPos}px`;
+            }
+
+            // Định vị marker ban đầu
+            positionMarker();
+
+            // Cập nhật vị trí marker khi cửa sổ thay đổi kích thước
+            window.addEventListener('resize', positionMarker);
+        }
+
+        // Tạo các marker khi tải trang
+        locations.forEach(location => {
+            createMarker(location);
+        });
+
+        // Đóng viewer khi nhấp vào nút Close
+        closeButton.addEventListener('click', () => {
+            viewerContainer.style.display = 'none';
+            if (viewer) {
+                viewer.destroy();
+            }
+        });
+    </script>
+</body>
+</html>
