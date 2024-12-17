@@ -21,7 +21,7 @@
         #map-container {
             position: relative;
             width: 100vw;
-            aspect-ratio: 16 / 9;
+            aspect-ratio: 12 / 9;
             background: #f0f0f0;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
             overflow: hidden;
@@ -61,7 +61,7 @@
             white-space: nowrap;
         }
 /* Marker và Label thu nhỏ khi trên iPhone 11 Pro Max khổ dọc */
-@media screen and (max-width: 614px) and (orientation: portrait) {
+@media screen and (max-width: 800px) and (orientation: portrait) {
     .marker {
         width: 10px; /* Thu nhỏ marker */
         height: 10px;
@@ -122,7 +122,7 @@
 <body>
     <!-- Bản đồ -->
     <div id="map-container">
-        <img id="map-image" src="images/mapLGN2.jpg" alt="Map" />
+        <img id="map-image" src="images/mapLGN3.jpg" alt="Map" />
     </div>
 
     <!-- Viewer ảnh 360 -->
@@ -133,18 +133,18 @@
 
     <script>
         const locations = [
-              { name: "ZoneB 1", image: "images/ZoneB1.jpg", x: 0.41, y: 0.61 },
-            { name: "ZoneB 2", image: "images/ZoneB2.jpg", x: 0.42, y: 0.53 },
-            { name: "ZoneB 3", image: "images/ZoneB3.jpg", x: 0.463, y: 0.675 },
-            { name: "ZoneB 4", image: "images/ZoneB4.jpg", x: 0.38, y: 0.68 },
-            { name: "ZoneA 1", image: "images/ZoneA1_Birdview.jpg", x: 0.605, y: 0.357 },
-            { name: "ZoneA 2", image: "images/ZoneA2.jpg", x: 0.56, y: 0.25 },
-            { name: "ZoneA 3", image: "images/ZoneA3.jpg", x: 0.51, y: 0.35 },
-            { name: "ZoneA 4", image: "images/ZoneA4.jpg", x: 0.6, y: 0.18 },
-            { name: "ZoneC 1", image: "images/ZoneC_A1.jpg", x: 0.49, y: 0.78 },
-            { name: "ZoneC 2", image: "images/ZoneC2_Birdview.jpg", x: 0.42, y: 0.80 },
-            { name: "ZoneC 3", image: "images/ZoneC3_Eyeview.jpg", x: 0.39, y: 0.75 },
-            { name: "ZoneC 4", image: "images/ZoneC4_Eyeview.jpg", x: 0.3, y: 0.75 },
+              { name: "ZoneB 1", image: "images/ZoneB1.jpg", x: 0.385, y: 0.54 },
+            { name: "ZoneB 2", image: "images/ZoneB2.jpg", x: 0.39, y: 0.47 },
+            { name: "ZoneB 3", image: "images/ZoneB3.jpg", x: 0.46, y: 0.61 },
+            { name: "ZoneB 4", image: "images/ZoneB4.jpg", x: 0.35, y: 0.61 },
+            { name: "ZoneA 1", image: "images/ZoneA1_Birdview.jpg", x: 0.605, y: 0.30 },
+            { name: "ZoneA 2", image: "images/ZoneA2.jpg", x: 0.57, y: 0.2 },
+            { name: "ZoneA 3", image: "images/ZoneA3.jpg", x: 0.51, y: 0.27 },
+            { name: "ZoneA 4", image: "images/ZoneA4.jpg", x: 0.6, y: 0.12 },
+            { name: "ZoneC 1", image: "images/ZoneC_A1.jpg", x: 0.48, y: 0.72 },
+            { name: "ZoneC 2", image: "images/ZoneC2_Birdview.jpg", x: 0.40, y: 0.73 },
+            { name: "ZoneC 3", image: "images/ZoneC3_Eyeview.jpg", x: 0.35, y: 0.68 },
+            { name: "ZoneC 4", image: "images/ZoneC4_Eyeview.jpg", x: 0.23, y: 0.68 },
             
         ];
 
