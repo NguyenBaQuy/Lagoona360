@@ -20,7 +20,8 @@
         /* Bản đồ */
         #map-container {
             position: relative;
-            width: 100vw;
+            //width: 100%;
+            height: 100vh;
             aspect-ratio: 12 / 9;
             background: #f0f0f0;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
@@ -55,16 +56,16 @@
             background: rgba(0, 0, 0, 0.7);
             color: white;
             padding: 3px 8px;
-            font-size: 12px;
+            font-size: 18px;
             border-radius: 5px;
             transform: translate(-50%, -150%);
             white-space: nowrap;
         }
 /* Marker và Label thu nhỏ khi trên iPhone 11 Pro Max khổ dọc */
-@media screen and (max-width: 800px) and (orientation: portrait) {
+@media screen and (max-width: 500px) and (orientation: portrait) {
     .marker {
-        width: 10px; /* Thu nhỏ marker */
-        height: 10px;
+        width: 15px; /* Thu nhỏ marker */
+        height: 15px;
     }
 
     .marker-label {
@@ -75,10 +76,10 @@
 
         @keyframes bounce {
             0%, 100% {
-                transform: translate(-50%, -50%) scale(1);
+                transform: translate(-50%, -50%) scale(0.7);
             }
             50% {
-                transform: translate(-50%, -50%) scale(1.2);
+                transform: translate(-50%, -50%) scale(1.1);
             }
         }
 
