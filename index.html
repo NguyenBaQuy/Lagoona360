@@ -3,31 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>360 Viewer with Fixed Marker Positions</title>
+    <title>360 Viewer with Fixed Labels</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum/build/pannellum.css" />
     <script src="https://cdn.jsdelivr.net/npm/pannellum/build/pannellum.js"></script>
     <style>
         body {
             margin: 0;
             font-family: Arial, sans-serif;
-            display: flex;
             height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #000;
         }
 
+        /* Bản đồ */
         #map-container {
             position: relative;
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            aspect-ratio: 16 / 9;
             background: #f0f0f0;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
             overflow: hidden;
         }
 
         #map-image {
             width: 100%;
-            height: auto;
-            display: block;
+            height: 100%;
+            object-fit: cover;
         }
 
+        /* Marker */
         .marker {
             position: absolute;
             width: 20px;
@@ -36,6 +42,12 @@
             border-radius: 50%;
             cursor: pointer;
             transform: translate(-50%, -50%);
+            animation: bounce 1s infinite;
+        }
+
+        .marker:hover {
+            background: yellow;
+            transform: scale(1.5);
         }
 
         .marker-label {
@@ -48,11 +60,17 @@
             transform: translate(-50%, -150%);
             white-space: nowrap;
         }
-.marker:hover {
-    background: yellow;
-    transform: scale(1.2);
-}
 
+        @keyframes bounce {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+        }
+
+        /* Viewer ảnh 360 */
         #viewer-container {
             position: fixed;
             top: 0;
@@ -90,9 +108,9 @@
     </style>
 </head>
 <body>
-    <!-- Bản đồ toàn màn hình -->
+    <!-- Bản đồ -->
     <div id="map-container">
-        <img id="map-image" src="images/mapLGN.jpg" alt="Map" />
+        <img id="map-image" src="images/mapLGN2.jpg" alt="Map" />
     </div>
 
     <!-- Viewer ảnh 360 -->
@@ -102,13 +120,12 @@
     </div>
 
     <script>
-        // Dữ liệu về vị trí và ảnh 360 với tọa độ tương đối
         const locations = [
-            { name: "ZoneB 1", image: "images/ZoneB1.jpg", x: 0.41, y: 0.61 },
+              { name: "ZoneB 1", image: "images/ZoneB1.jpg", x: 0.41, y: 0.61 },
             { name: "ZoneB 2", image: "images/ZoneB2.jpg", x: 0.42, y: 0.53 },
             { name: "ZoneB 3", image: "images/ZoneB3.jpg", x: 0.463, y: 0.675 },
             { name: "ZoneB 4", image: "images/ZoneB4.jpg", x: 0.38, y: 0.68 },
-            { name: "ZoneA 1", image: "images/ZoneA1_Birdview.jpg", x: 0.60, y: 0.36 },
+            { name: "ZoneA 1", image: "images/ZoneA1_Birdview.jpg", x: 0.605, y: 0.357 },
             { name: "ZoneA 2", image: "images/ZoneA2.jpg", x: 0.56, y: 0.25 },
             { name: "ZoneA 3", image: "images/ZoneA3.jpg", x: 0.51, y: 0.35 },
             { name: "ZoneA 4", image: "images/ZoneA4.jpg", x: 0.6, y: 0.18 },
@@ -123,26 +140,22 @@
         const mapImage = document.getElementById('map-image');
         const viewerContainer = document.getElementById('viewer-container');
         const closeButton = document.getElementById('close-button');
-        let viewer; // Viewer ảnh 360
+        let viewer;
 
-        // Hàm hiển thị ảnh 360
+        // Hiển thị ảnh 360
         function loadImage(imagePath) {
-            if (viewer) {
-                viewer.destroy();
-            }
+            if (viewer) viewer.destroy();
             viewerContainer.style.display = 'block';
             viewer = pannellum.viewer('viewer', {
                 type: 'equirectangular',
                 panorama: imagePath,
                 autoLoad: true,
-                showControls: true,
- hfov: 120, // Góc nhìn ngang ban đầu
-        minHfov: 100, // Giới hạn thu nhỏ
-        maxHfov: 120 // Giới hạn phóng to
+                autoRotate: -2,
+                showControls: true
             });
         }
 
-        // Hàm tạo marker
+        // Tạo marker và label
         function createMarker(location) {
             const marker = document.createElement('div');
             marker.className = 'marker';
@@ -152,43 +165,36 @@
             label.className = 'marker-label';
             label.innerText = location.name;
 
-            marker.addEventListener('click', () => {
-                loadImage(location.image);
-            });
+            // Sự kiện click vào marker để mở ảnh 360
+            marker.addEventListener('click', () => loadImage(location.image));
 
             mapContainer.appendChild(marker);
             mapContainer.appendChild(label);
 
-            // Định vị marker và label dựa trên kích thước thực tế của hình ảnh
+            // Định vị marker và label
             function positionMarker() {
-                const rect = mapImage.getBoundingClientRect();
-                const xPos = rect.left + location.x * rect.width;
-                const yPos = rect.top + location.y * rect.height;
+                const rect = mapContainer.getBoundingClientRect();
+                const xPos = location.x * rect.width;
+                const yPos = location.y * rect.height;
 
                 marker.style.left = `${xPos}px`;
                 marker.style.top = `${yPos}px`;
+
                 label.style.left = `${xPos}px`;
                 label.style.top = `${yPos}px`;
             }
 
-            // Định vị marker ban đầu
             positionMarker();
-
-            // Cập nhật vị trí marker khi cửa sổ thay đổi kích thước
             window.addEventListener('resize', positionMarker);
         }
 
-        // Tạo các marker khi tải trang
-        locations.forEach(location => {
-            createMarker(location);
-        });
+        // Tạo các marker và label khi tải trang
+        locations.forEach(location => createMarker(location));
 
-        // Đóng viewer khi nhấp vào nút Close
+        // Đóng viewer khi nhấn nút Close
         closeButton.addEventListener('click', () => {
             viewerContainer.style.display = 'none';
-            if (viewer) {
-                viewer.destroy();
-            }
+            if (viewer) viewer.destroy();
         });
     </script>
 </body>
